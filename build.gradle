@@ -1,0 +1,76 @@
+apply plugin: 'com.android.library'
+
+android {
+    compileSdkVersion 23
+    buildToolsVersion '23.0.3'
+
+    compileOptions.encoding = 'ISO-8859-1'
+
+    defaultConfig {
+        minSdkVersion 15
+        targetSdkVersion 23
+
+        consumerProguardFiles 'proguard-project.pro'
+    }
+
+    packagingOptions {
+        exclude 'jsr305_annotations/Jsr305_annotations.gwt.xml'
+    }
+
+    buildTypes {
+        modular {
+            minifyEnabled false
+        }
+        debug {
+            minifyEnabled false
+            proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-project.pro'
+        }
+        release {
+            minifyEnabled true
+            proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-project.pro'
+        }
+    }
+    publishNonDefault true
+
+}
+
+repositories {
+    jcenter()
+    mavenCentral()
+    maven {
+        credentials{
+            username System.getenv("MAVEN_USERNAME")
+            password System.getenv("MAVEN_PASSWORD")
+        }
+        url 'https://dl.bintray.com/applicaster-ltd/maven'
+    }
+}
+
+dependencies {
+    // Applicaster SDK
+    def applicasterSDKPath = 'com.applicaster:applicaster-android-sdk:2.+'
+
+    // Check if an open SDK is defined - if not use the closed one.
+    def devSDK = findProject(':applicaster-android-sdk')
+    if(devSDK != null){
+        compile project(path: ':applicaster-android-sdk', configuration: 'modular')
+    }
+    else{
+        compile (applicasterSDKPath)
+    }
+    compile 'org.apache.commons:commons-lang3:3.5'
+    compile 'com.google.firebase:firebase-core:10.0.1'
+    testCompile 'org.robolectric:robolectric:3.1'
+    testCompile 'junit:junit:4.12'
+    compile fileTree(include: '**/*.jar', dir: 'libs')
+}
+
+buildscript {
+    repositories {
+        jcenter()
+    }
+    dependencies {
+        classpath 'com.android.tools.build:gradle:2.1.0'
+        classpath 'com.google.gms:google-services:3.+'
+    }
+}
