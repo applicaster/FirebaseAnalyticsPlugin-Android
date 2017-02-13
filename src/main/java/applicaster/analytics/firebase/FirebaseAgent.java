@@ -136,16 +136,16 @@ public class FirebaseAgent extends BaseAnalyticsAgent {
      * 2. The "firebase_" prefix is reserved and should not be used.
      */
     public static StringBuilder refactorParamValue(StringBuilder evenValue) {
+        
+        if(evenValue.indexOf(FIREBASE_PREFIX) == 0){
+            evenValue.insert(0, "_");
+        }
 
         //Param values can be up to 100 characters long.
         if (evenValue.length() > MAX_PARAM_VALUE_CHARACTERS_LONG) {
             evenValue.delete(MAX_PARAM_VALUE_CHARACTERS_LONG, evenValue.length() - 1);
         }
-
-        if(evenValue.indexOf(FIREBASE_PREFIX) == 0){
-            evenValue.insert(0, "_");
-        }
-
+        
         return evenValue;
     }
 
