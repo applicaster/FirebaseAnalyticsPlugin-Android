@@ -39,6 +39,13 @@ public class FirebaseAgent extends BaseAnalyticsAgent {
         legend = getLegend(context);
     }
 
+    @Override
+    public void sendUserID(String userId) {
+        super.sendUserID(userId);
+        mFirebaseAnalytics.setUserId(userId);
+    }
+
+
     public static Map<Character,String> getLegend(Context context) {
         JSONObject jObject = null;
         Map<Character, String> output = new HashMap<>();
