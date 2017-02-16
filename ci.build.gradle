@@ -65,8 +65,8 @@ repositories {
     maven {
         url 'http://maven.7factory.de:8081/nexus/content/repositories/releases/'
         credentials {
-            username 'applicaster'
-            password 'Eno44)9g?>yPfjt'
+            username System.getenv("MAVEN_USERNAME")
+            password System.getenv("MAVEN_PASSWORD")
         }
     }
 }
