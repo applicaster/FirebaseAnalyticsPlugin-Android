@@ -5,16 +5,18 @@ import android.os.Bundle;
 
 import com.applicaster.analytics.BaseAnalyticsAgent;
 import com.applicaster.util.APLogger;
+import com.applicaster.util.OSUtil;
+import com.applicaster.util.StringUtil;
 import com.google.firebase.analytics.FirebaseAnalytics;
-import org.apache.commons.lang3.StringUtils;
+
 import org.json.JSONException;
 import org.json.JSONObject;
 
-import java.io.IOException;;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
 import java.util.TreeMap;
+
 
 /**
  * Created by eladbendavid on 18/01/2017.
@@ -50,7 +52,7 @@ public class FirebaseAgent extends BaseAnalyticsAgent {
         JSONObject jObject = null;
         Map<Character, String> output = new HashMap<>();
         try {
-            String content = Utilities.getFileContent(context, R.raw.legend);
+            String content = OSUtil.readRawTextFile(context, R.raw.legend);
             jObject = new JSONObject(content);
         } catch (Exception e) {
             APLogger.error(TAG, "failed to load JSON legend", e);
@@ -89,10 +91,16 @@ public class FirebaseAgent extends BaseAnalyticsAgent {
                 StringBuilder nameBuilder = new StringBuilder(entry.getKey());
                 StringBuilder valueBuilder = new StringBuilder(entry.getValue());
 
-                String name = refactorParamName(legend, nameBuilder).toString();
+                String name = refactorEventNameAndParamsName(legend, nameBuilder).toString();
                 String value = refactorParamValue(valueBuilder).toString();
 
                 bundle.putString(name, value);
+            }
+        }
+        if(StringUtil.isNotEmpty(eventName)) {
+            StringBuilder eventNameBuilder  = refactorEventNameAndParamsName(legend, new StringBuilder(eventName));
+            if(eventNameBuilder !=null ){
+                eventName = eventNameBuilder.toString();
             }
         }
         mFirebaseAnalytics.logEvent(eventName, bundle);
@@ -107,7 +115,7 @@ public class FirebaseAgent extends BaseAnalyticsAgent {
      * 3. must start with an alphabetic character.
      * 4. The "firebase_" prefix is reserved and should not be used.
      */
-    public static StringBuilder refactorParamName(Map<Character,String> legend, StringBuilder eventName) {
+    public static StringBuilder refactorEventNameAndParamsName(Map<Character,String> legend, StringBuilder eventName) {
         //Contain alphanumeric characters and underscores ("_").
         for (int i =0 ; i < eventName.length() ; i++) {
             char current = eventName.charAt(i);
@@ -115,7 +123,7 @@ public class FirebaseAgent extends BaseAnalyticsAgent {
                 String replace =  legend.get(current);
                 eventName.replace(i, i + 1, replace);
                 i+= (replace.length() -1 );
-            }else if( !StringUtils.isAlphanumeric(String.valueOf(current))){
+            }else if( !isAlphanumeric(String.valueOf(current))){
                 eventName.replace(i, i + 1, UNEXPECTED_CHARACTER_LEGEND);
                 i+= (UNEXPECTED_CHARACTER_LEGEND.length() -1 );
             }
@@ -124,7 +132,7 @@ public class FirebaseAgent extends BaseAnalyticsAgent {
         if(eventName.indexOf(FIREBASE_PREFIX) == 0){
             eventName.insert(0, "9");
         }// must start with an alphabetic character.
-        else if(!StringUtils.isAlphanumeric("" + eventName.charAt(0))){
+        else if(!isAlphanumeric("" + eventName.charAt(0))){
             eventName.insert(0,'9');
         }
 
@@ -156,5 +164,33 @@ public class FirebaseAgent extends BaseAnalyticsAgent {
         return evenValue;
     }
 
-
+    /**
+     * <p>Checks if the String contains only Unicode letters or digits or underscore.</p>
+     *
+     * <p>{@code null} will return {@code false}.
+     * An empty String (length()=0) will return {@code false}.</p>
+     *
+     * <pre>
+     * StringUtils.isAlphanumeric(null)   = false
+     * StringUtils.isAlphanumeric("")     = false
+     * StringUtils.isAlphanumeric("  ")   = false
+     * StringUtils.isAlphanumeric("abc")  = true
+     * StringUtils.isAlphanumeric("ab c") = false
+     * StringUtils.isAlphanumeric("ab2c") = true
+     * StringUtils.isAlphanumeric("ab-c") = false
+     * * StringUtils.isAlphanumeric("ab_c") = true
+     * </pre>
+     *
+     * @param cs  the String to check, may be null
+     * @return {@code true} if only contains letters or digits or underscore,
+     *  and is non-null
+     * @since 3.0 Changed signature from isAlphanumeric(String) to isAlphanumeric(CharSequence)
+     * @since 3.0 Changed "" to return false and not true
+     */
+    public static boolean isAlphanumeric(final String input) {
+        if (StringUtil.isEmpty(input)) {
+            return false;
+        }
+        return input.matches("^[a-zA-Z0-9_]*$") ;
+    }
 }

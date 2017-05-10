@@ -1,7 +1,10 @@
 package applicaster.analytics.firebase;
 
 
-import org.apache.commons.lang3.StringUtils;
+import android.app.Application;
+
+import com.applicaster.app.CustomApplication;
+
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -19,10 +22,22 @@ import static junit.framework.Assert.assertTrue;
  * Created by eladbendavid on 25/01/2017.
  */
 @RunWith(RobolectricTestRunner.class)
-@Config(constants = BuildConfig.class, sdk = 23, manifest = "src/main/AndroidManifest.xml")
+@Config(constants = BuildConfig.class, application = FireBaseAgentTest.TestCustomApplication.class, sdk = 18)
+
+
 
 public class FireBaseAgentTest {
 
+    // since CustomApplication failed on Robolectric init. i override the problematic function
+    public static class TestCustomApplication extends CustomApplication {
+
+        @Override
+        protected void primaryApplicationSetup(Application application) {
+//            onCreateBehaviour(application);
+            initializeInjectors();
+        }
+
+    }
     /**
      * Firebase param names limitations:
      * **********************
@@ -40,14 +55,14 @@ public class FireBaseAgentTest {
             input.append('1');
         }
         // 1. Param names can be up to 40 characters long.
-        assertEquals(MAX_PARAM_NAME_CHARACTERS_LONG, FirebaseAgent.refactorParamName(FirebaseAgent.getLegend(RuntimeEnvironment.application), input).length());
+        assertEquals(MAX_PARAM_NAME_CHARACTERS_LONG, FirebaseAgent.refactorEventNameAndParamsName(FirebaseAgent.getLegend(RuntimeEnvironment.application), input).length());
     }
 
     @Test
     public void removeNonAlphanumericCharacters() {
         StringBuilder input = new StringBuilder("%^$");
-        FirebaseAgent.refactorParamName(FirebaseAgent.getLegend(RuntimeEnvironment.application), input);
-        boolean hasNonAlpha = StringUtils.isAlphanumeric(input.toString().replaceAll("_", ""));
+        FirebaseAgent.refactorEventNameAndParamsName(FirebaseAgent.getLegend(RuntimeEnvironment.application), input);
+        boolean hasNonAlpha = FirebaseAgent.isAlphanumeric(input.toString().replaceAll("_", ""));
         //2. Contain alphanumeric characters and underscores ("_").
         assertTrue(hasNonAlpha);
     }
@@ -55,17 +70,24 @@ public class FireBaseAgentTest {
     @Test
     public void addAlphabeticPrefix(){
         StringBuilder input = new StringBuilder("$33");
-        FirebaseAgent.refactorParamName(FirebaseAgent.getLegend(RuntimeEnvironment.application), input);
-        boolean hasNonAlpha = StringUtils.isAlphanumeric("" + input.charAt(0));
+        FirebaseAgent.refactorEventNameAndParamsName(FirebaseAgent.getLegend(RuntimeEnvironment.application), input);
+        boolean hasNonAlpha = FirebaseAgent.isAlphanumeric("" + input.charAt(0));
         //3. must start with an alphabetic character.
         assertTrue(hasNonAlpha);
 
     }
+    @Test
+    public void isAlphanumeric(){
+        StringBuilder input = new StringBuilder("3_3");
+        boolean hasNonAlpha = FirebaseAgent.isAlphanumeric("" + input);
+        //3. must start with an alphabetic character.
+        assertTrue(hasNonAlpha);
 
+    }
     @Test
     public void notStartWithFirebase_(){
         StringBuilder input = new StringBuilder(FIREBASE_PREFIX);
-        FirebaseAgent.refactorParamName(FirebaseAgent.getLegend(RuntimeEnvironment.application), input);
+        FirebaseAgent.refactorEventNameAndParamsName(FirebaseAgent.getLegend(RuntimeEnvironment.application), input);
         //4. The "firebase_" prefix is reserved and should not be used.
         assertFalse(input.toString().indexOf(FIREBASE_PREFIX) == 0);
 
