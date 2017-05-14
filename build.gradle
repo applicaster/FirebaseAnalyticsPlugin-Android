@@ -33,6 +33,7 @@ android {
 repositories {
     jcenter()
     mavenCentral()
+    maven { url 'https://jitpack.io' }
     maven { // Applicaster
         credentials{
             username System.getenv("MAVEN_USERNAME")
@@ -54,7 +55,7 @@ buildscript {
 
 dependencies {
     // Applicaster SDK
-    def applicasterSDKPath = 'com.applicaster:applicaster-android-sdk:2.14.9'
+    def applicasterSDKPath = 'com.applicaster:applicaster-android-sdk:2.14.+'
 
     // Check if an open SDK is defined - if not use the closed one.
     def devSDK = findProject(':applicaster-android-sdk')
@@ -62,7 +63,7 @@ dependencies {
         compile project(path: ':applicaster-android-sdk', configuration: 'debug')
     }
     else{
-        //compile (applicasterSDKPath)
+        debugCompile(applicasterSDKPath)
     }
     releaseCompile (applicasterSDKPath)
 
