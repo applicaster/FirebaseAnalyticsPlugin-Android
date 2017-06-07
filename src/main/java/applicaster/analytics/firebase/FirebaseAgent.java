@@ -77,6 +77,7 @@ public class FirebaseAgent extends BaseAnalyticsAgent {
 
     @Override
     public void logEvent(String eventName) {
+        super.logEvent(eventName);
         logEvent(eventName, null);
     }
 
