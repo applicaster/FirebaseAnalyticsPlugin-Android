@@ -1,4 +1,3 @@
-apply plugin: 'android-sdk-manager'
 apply plugin: 'com.android.library'
 
 android {
@@ -33,6 +32,7 @@ android {
 repositories {
     jcenter()
     mavenCentral()
+    maven { url 'https://maven.google.com' }
     maven { url 'https://jitpack.io' }
     maven { // Applicaster
         credentials{
@@ -43,19 +43,9 @@ repositories {
     }
 }
 
-//SDK Manager
-buildscript {
-    repositories {
-        maven { url 'https://jitpack.io' }
-    }
-    dependencies {
-        classpath 'com.github.JakeWharton:sdk-manager-plugin:1d29782dd6ffa18880c8cbada748fb3dea45e7be'
-    }
-}
-
 dependencies {
     // Applicaster SDK
-    def applicasterSDKPath = 'com.applicaster:applicaster-android-sdk:2.14.+'
+    def applicasterSDKPath = 'com.applicaster:applicaster-android-sdk:2.22.2'
 
     // Check if an open SDK is defined - if not use the closed one.
     def devSDK = findProject(':applicaster-android-sdk')
@@ -67,7 +57,7 @@ dependencies {
     }
     releaseCompile (applicasterSDKPath)
 
-    compile 'com.google.firebase:firebase-core:10.2.1'
+    compile 'com.google.firebase:firebase-core:11.0.4'
     compile fileTree(dir: 'libs', include: ['*.jar'])
 
     testCompile 'junit:junit:4.11'
@@ -85,7 +75,7 @@ buildscript {
         jcenter()
     }
     dependencies {
-        classpath 'com.android.tools.build:gradle:2.2.3'
+        classpath 'com.android.tools.build:gradle:2.3.3'
         classpath 'com.github.dcendents:android-maven-plugin:1.2'
         classpath 'com.jfrog.bintray.gradle:gradle-bintray-plugin:1.2'
     }
