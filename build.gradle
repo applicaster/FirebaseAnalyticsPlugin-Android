@@ -1,12 +1,12 @@
 apply plugin: 'com.android.library'
 
 android {
-    compileSdkVersion 26
-    buildToolsVersion "26.0.2"
+    compileSdkVersion 27
+    buildToolsVersion "27.0.2"
 
     defaultConfig {
         minSdkVersion 17
-        targetSdkVersion 26
+        targetSdkVersion 27
 
         consumerProguardFiles 'proguard-rules.pro'
     }
@@ -26,16 +26,19 @@ android {
         abortOnError false
     }
 
-    publishNonDefault true
+    compileOptions {
+        sourceCompatibility JavaVersion.VERSION_1_8
+        targetCompatibility JavaVersion.VERSION_1_8
+    }
 }
 
 repositories {
+    google()
     jcenter()
     mavenCentral()
-    maven { url 'https://maven.google.com' }
     maven { url 'https://jitpack.io' }
     maven { // Applicaster
-        credentials{
+        credentials {
             username System.getenv("MAVEN_USERNAME")
             password System.getenv("MAVEN_PASSWORD")
         }
@@ -44,40 +47,39 @@ repositories {
 }
 
 dependencies {
-    // Applicaster SDK
-    def applicasterSDKPath = 'com.applicaster:applicaster-android-sdk:2.22.2'
 
     // Check if an open SDK is defined - if not use the closed one.
     def devSDK = findProject(':applicaster-android-sdk')
-    if(devSDK != null){
-        compile project(path: ':applicaster-android-sdk', configuration: 'debug')
+    if (devSDK != null) {
+        implementation project(':applicaster-android-sdk')
+    } else {
+        implementation 'com.applicaster:applicaster-android-sdk:2.32.7'
     }
-    else{
-        debugCompile(applicasterSDKPath)
-    }
-    releaseCompile (applicasterSDKPath)
-
-    compile 'com.google.firebase:firebase-core:11.0.4'
-    compile fileTree(dir: 'libs', include: ['*.jar'])
+    implementation 'com.google.firebase:firebase-core:12.0.1'
+    implementation fileTree(dir: 'libs', include: ['*.jar'])
 
     testCompile 'junit:junit:4.11'
     testCompile "org.assertj:assertj-core:1.7.0"
     testCompile 'org.robolectric:robolectric:3.3.2'
+
 }
 
 //---------------------------------- Bintray ----------------------------------//
 
 apply plugin: 'maven-publish'
 apply plugin: 'com.jfrog.bintray'
+apply plugin: 'com.github.dcendents.android-maven'
 
 buildscript {
     repositories {
+        google()
         jcenter()
+        mavenCentral()
     }
     dependencies {
-        classpath 'com.android.tools.build:gradle:2.3.3'
-        classpath 'com.github.dcendents:android-maven-plugin:1.2'
-        classpath 'com.jfrog.bintray.gradle:gradle-bintray-plugin:1.2'
+        classpath 'com.android.tools.build:gradle:3.0.1'
+        classpath 'com.github.dcendents:android-maven-gradle-plugin:2.0'
+        classpath 'com.jfrog.bintray.gradle:gradle-bintray-plugin:1.8.0'
     }
 }
 
@@ -94,7 +96,7 @@ def getVersionName = { ->
         return stdout.toString().trim()
     }
     catch (ignored) {
-        return null;
+        return null
     }
 }
 
@@ -109,7 +111,7 @@ publishing {
                 version versionFromTag
 
                 artifactId ARTIFACT_ID
-                artifact "build/outputs/aar/"+ARTIFACT_FILE_NAME+"-release.aar"
+                artifact "build/outputs/aar/" + ARTIFACT_FILE_NAME + "-release.aar"
                 artifact androidJavadocsJar
                 artifact androidSourcesJar
                 pom.withXml {
@@ -146,20 +148,39 @@ publishing {
                             dependencyNode.appendNode('version', it.version)
                         }
                     }
+                    configurations.implementation.allDependencies.each {
+                        if (!it.name.is('unspecified')) {
+                            def dependencyNode = dependenciesNode.appendNode('dependency')
+                            dependencyNode.appendNode('groupId', it.group)
+                            dependencyNode.appendNode('artifactId', it.name)
+                            dependencyNode.appendNode('version', it.version)
+                        }
+                    }
+                    configurations.api.allDependencies.each {
+                        if (!it.name.is('unspecified')) {
+                            def dependencyNode = dependenciesNode.appendNode('dependency')
+                            dependencyNode.appendNode('groupId', it.group)
+                            dependencyNode.appendNode('artifactId', it.name)
+                            dependencyNode.appendNode('version', it.version)
+                        }
+                    }
                 }
             }
         }
     }
 }
 
-def getBintrayUserProperty() {
+static def getBintrayUserProperty() {
     return System.getenv("BINTRAY_USER")
 }
 
-def getBintrayApiKeyProperty() {
+static def getBintrayApiKeyProperty() {
     return System.getenv("BINTRAY_API_KEY")
 }
 
+bintrayUpload {
+    dependsOn "publishMavenJavaPublicationToMavenLocal"
+}
 bintray {
     user = bintrayUserProperty
     key = bintrayApiKeyProperty
@@ -176,9 +197,9 @@ bintray {
         vcsUrl = POM_SCM_URL
         licenses = ['Apache-2.0']
         labels = ['aar', 'android']
-        version{
+        version {
             name = getVersionName()
-            vcsTag = 'v'+getVersionName()
+            vcsTag = 'v' + getVersionName()
         }
     }
 }
