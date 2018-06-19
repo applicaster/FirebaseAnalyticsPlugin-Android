@@ -78,6 +78,7 @@ public class FirebaseAgent extends BaseAnalyticsAgent {
     @Override
     public void logEvent(String eventName) {
         logEvent(eventName, null);
+        super.logEvent(eventName);
     }
 
     @Override
@@ -106,6 +107,18 @@ public class FirebaseAgent extends BaseAnalyticsAgent {
         mFirebaseAnalytics.logEvent(eventName, bundle);
     }
 
+    @Override
+    public void startTimedEvent(String eventName) {
+        super.startTimedEvent(eventName);
+        startTimedEvent(eventName, null);
+
+    }
+
+    @Override
+    public void startTimedEvent(String eventName, TreeMap<String, String> params) {
+        super.startTimedEvent(eventName, params);
+        logEvent(eventName, params);
+    }
 
     /**
      * Firebase param names limitations:
