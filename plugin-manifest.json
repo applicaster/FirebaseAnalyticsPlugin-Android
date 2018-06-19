@@ -1,0 +1,23 @@
+{
+  "api": {
+    "class_name": "applicaster.analytics.firebase.FirebaseAgent",
+    "proguard_rules": "-keep public class applicaster.analytics.firebase.FirebaseAgent{public \u003cfields\u003e;public \u003cmethods\u003e;} -keep public class com.akamai.** {public \u003cfields\u003e; public \u003cmethods\u003e;}",
+    "require_startup_execution": false
+  },
+  "name": "Firebase",
+  "type": "analytics",
+  "platform": "android",
+  "identifier": "firebase_android",
+  "author_name": "Elad Ben David",
+  "description": "provide Firebase as analytics agent",
+  "author_email": "e.bendavid@applicaster.com",
+  "min_zapp_sdk": "6.2.0b12",
+  "react_native": false,
+  "ui_builder_support": true,
+  "dependency_name": "com.applicaster:FirebaseAnalyticsPlugin",
+  "manifest_version": "1.3.2",
+  "dependency_version": "1.3.+",
+  "dependency_repository_url": [],
+  "custom_configuration_fields": [],
+  "whitelisted_account_ids": []
+}
