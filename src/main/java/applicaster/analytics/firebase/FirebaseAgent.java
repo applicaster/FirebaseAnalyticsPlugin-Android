@@ -2,11 +2,13 @@ package applicaster.analytics.firebase;
 
 import android.content.Context;
 import android.os.Bundle;
+import android.os.SystemClock;
 
 import com.applicaster.analytics.BaseAnalyticsAgent;
 import com.applicaster.util.APLogger;
 import com.applicaster.util.OSUtil;
 import com.applicaster.util.StringUtil;
+import com.devbrackets.android.exomedia.util.TimeFormatUtil;
 import com.google.firebase.analytics.FirebaseAnalytics;
 
 import org.json.JSONException;
@@ -27,11 +29,14 @@ public class FirebaseAgent extends BaseAnalyticsAgent {
     public static final int MAX_PARAM_NAME_CHARACTERS_LONG = 40;
     public static final int MAX_PARAM_VALUE_CHARACTERS_LONG = 100;
     public static final String UNEXPECTED_CHARACTER_LEGEND = "_9";
+    public static final String EVENT_DURATION = "Event Duration";
     public static final String FIREBASE_PREFIX = "firebase_";
     private static final String TAG = FirebaseAgent.class.getSimpleName();
     private Map<Character,String> legend;
 
     private FirebaseAnalytics mFirebaseAnalytics;
+
+    private long startTimedEvent = -1;
 
     @Override
     public void initializeAnalyticsAgent(Context context) {
@@ -117,6 +122,24 @@ public class FirebaseAgent extends BaseAnalyticsAgent {
     @Override
     public void startTimedEvent(String eventName, TreeMap<String, String> params) {
         super.startTimedEvent(eventName, params);
+        startTimedEvent = SystemClock.elapsedRealtime();
+    }
+
+    @Override
+    public void endTimedEvent(String eventName) {
+        super.endTimedEvent(eventName);
+        endTimedEvent(eventName, null);
+    }
+
+    @Override
+    public void endTimedEvent(String eventName, TreeMap<String, String> params) {
+        super.endTimedEvent(eventName, params);
+
+        if (startTimedEvent != -1) {
+            long endTimedEvent = SystemClock.elapsedRealtime();
+            long elapsedMilliSeconds = endTimedEvent - startTimedEvent;
+            params.put(EVENT_DURATION, TimeFormatUtil.formatMs(elapsedMilliSeconds));
+        }
         logEvent(eventName, params);
     }
 
@@ -194,7 +217,7 @@ public class FirebaseAgent extends BaseAnalyticsAgent {
      * * StringUtils.isAlphanumeric("ab_c") = true
      * </pre>
      *
-     * @param cs  the String to check, may be null
+     * @param input the String to check, may be null
      * @return {@code true} if only contains letters or digits or underscore,
      *  and is non-null
      * @since 3.0 Changed signature from isAlphanumeric(String) to isAlphanumeric(CharSequence)
