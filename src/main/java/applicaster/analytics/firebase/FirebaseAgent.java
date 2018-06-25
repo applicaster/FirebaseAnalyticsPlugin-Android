@@ -36,7 +36,7 @@ public class FirebaseAgent extends BaseAnalyticsAgent {
 
     private FirebaseAnalytics mFirebaseAnalytics;
 
-    private long startTimedEvent = -1;
+    private Map<String,Long> timedEventMap;
 
     @Override
     public void initializeAnalyticsAgent(Context context) {
@@ -122,22 +122,23 @@ public class FirebaseAgent extends BaseAnalyticsAgent {
     @Override
     public void startTimedEvent(String eventName, TreeMap<String, String> params) {
         super.startTimedEvent(eventName, params);
-        startTimedEvent = SystemClock.elapsedRealtime();
+        if (timedEventMap == null)
+            timedEventMap = new HashMap<>();
+        timedEventMap.put(eventName,SystemClock.elapsedRealtime());
     }
 
     @Override
     public void endTimedEvent(String eventName) {
         super.endTimedEvent(eventName);
-        endTimedEvent(eventName, null);
     }
 
     @Override
     public void endTimedEvent(String eventName, TreeMap<String, String> params) {
         super.endTimedEvent(eventName, params);
 
-        if (startTimedEvent != -1) {
+        if (timedEventMap != null && timedEventMap.get(eventName) != null) {
             long endTimedEvent = SystemClock.elapsedRealtime();
-            long elapsedMilliSeconds = endTimedEvent - startTimedEvent;
+            long elapsedMilliSeconds = endTimedEvent - timedEventMap.get(eventName);
             params.put(EVENT_DURATION, TimeFormatUtil.formatMs(elapsedMilliSeconds));
         }
         logEvent(eventName, params);
