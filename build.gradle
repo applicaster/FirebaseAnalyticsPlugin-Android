@@ -53,7 +53,7 @@ dependencies {
     if (devSDK != null) {
         implementation project(':applicaster-android-sdk')
     } else {
-        implementation 'com.applicaster:applicaster-android-sdk:2.32.7'
+        implementation 'com.applicaster:applicaster-android-sdk:2.32.15'
     }
     implementation 'com.google.firebase:firebase-core:12.0.1'
     implementation fileTree(dir: 'libs', include: ['*.jar'])
