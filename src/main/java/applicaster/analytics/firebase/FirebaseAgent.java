@@ -8,7 +8,6 @@ import com.applicaster.analytics.BaseAnalyticsAgent;
 import com.applicaster.util.APLogger;
 import com.applicaster.util.OSUtil;
 import com.applicaster.util.StringUtil;
-import com.devbrackets.android.exomedia.util.TimeFormatUtil;
 import com.google.firebase.analytics.FirebaseAnalytics;
 
 import org.json.JSONException;
@@ -18,6 +17,7 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
 import java.util.TreeMap;
+import java.util.concurrent.TimeUnit;
 
 
 /**
@@ -139,7 +139,7 @@ public class FirebaseAgent extends BaseAnalyticsAgent {
         if (timedEventMap != null && timedEventMap.get(eventName) != null) {
             long endTimedEvent = SystemClock.elapsedRealtime();
             long elapsedMilliSeconds = endTimedEvent - timedEventMap.get(eventName);
-            params.put(EVENT_DURATION, TimeFormatUtil.formatMs(elapsedMilliSeconds));
+            params.put(EVENT_DURATION, String.valueOf(TimeUnit.MILLISECONDS.toSeconds(elapsedMilliSeconds)));
         }
         logEvent(eventName, params);
     }
