@@ -1,16 +1,9 @@
 package applicaster.analytics.firebase;
 
-
-import android.app.Application;
-
-import com.applicaster.app.CustomApplication;
-
-import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.robolectric.RobolectricTestRunner;
 import org.robolectric.RuntimeEnvironment;
-import org.robolectric.annotation.Config;
 
 import static applicaster.analytics.firebase.FirebaseAgent.FIREBASE_PREFIX;
 import static applicaster.analytics.firebase.FirebaseAgent.MAX_PARAM_NAME_CHARACTERS_LONG;
@@ -18,37 +11,12 @@ import static junit.framework.Assert.assertEquals;
 import static junit.framework.Assert.assertFalse;
 import static junit.framework.Assert.assertTrue;
 
-/**
- * Created by eladbendavid on 25/01/2017.
- */
 @RunWith(RobolectricTestRunner.class)
-@Config(constants = BuildConfig.class, application = FireBaseAgentTest.TestCustomApplication.class, sdk = 18)
-
-
-
-public class FireBaseAgentTest {
-
-    // since CustomApplication failed on Robolectric init. i override the problematic function
-    public static class TestCustomApplication extends CustomApplication {
-
-        @Override
-        protected void primaryApplicationSetup(Application application) {
-//            onCreateBehaviour(application);
-            initializeInjectors();
-        }
-
-    }
-    /**
-     * Firebase param names limitations:
-     * **********************
-     * 1. Param names can be up to 40 characters long.
-     * 2. Contain alphanumeric characters and underscores ("_").
-     * 3. must start with an alphabetic character.
-     * 4. The "firebase_" prefix is reserved and should not be used.
-     */
+public class FirebaseAgentTest {
 
     @Test
     public void removeLastCharacters() {
+
         StringBuilder input = new StringBuilder();
 
         for (int i = 0; i < MAX_PARAM_NAME_CHARACTERS_LONG + 100; i++) {
@@ -57,7 +25,6 @@ public class FireBaseAgentTest {
         // 1. Param names can be up to 40 characters long.
         assertEquals(MAX_PARAM_NAME_CHARACTERS_LONG, FirebaseAgent.refactorEventNameAndParamsName(FirebaseAgent.getLegend(RuntimeEnvironment.application), input).length());
     }
-
     @Test
     public void removeNonAlphanumericCharacters() {
         StringBuilder input = new StringBuilder("%^$");
