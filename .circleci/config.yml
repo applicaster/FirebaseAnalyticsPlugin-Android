@@ -1,5 +1,5 @@
 defaults: &defaults
-    working_directory: ~/$CIRCLE_PROJECT_REPONAME
+    working_directory: ~/FirebaseAnalyticsPlugin-Android
     docker:
       - image: circleci/android:api-28-node8-alpha
         environment:
