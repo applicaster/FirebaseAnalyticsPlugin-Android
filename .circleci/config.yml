@@ -1,7 +1,7 @@
 defaults: &defaults
     working_directory: ~/FirebaseAnalyticsPlugin-Android
     docker:
-      - image: circleci/android:api-28-node8-alpha
+      - image: circleci/android:api-27
         environment:
           CIRCLE_ARTIFACTS: /tmp/circleci-artifacts
           CIRCLE_TEST_REPORTS: /tmp/circleci-test-results
