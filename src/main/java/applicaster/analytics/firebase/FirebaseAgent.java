@@ -1,5 +1,6 @@
 package applicaster.analytics.firebase;
 
+import android.app.Activity;
 import android.content.Context;
 import android.os.Bundle;
 import android.os.SystemClock;
@@ -20,6 +21,8 @@ import java.util.Map;
 import java.util.TreeMap;
 import java.util.concurrent.TimeUnit;
 
+import javax.annotation.Nullable;
+
 
 /**
  * Created by eladbendavid on 18/01/2017.
@@ -32,16 +35,16 @@ public class FirebaseAgent extends BaseAnalyticsAgent {
     public static final String UNEXPECTED_CHARACTER_LEGEND = "_9";
     public static final String EVENT_DURATION = "Event Duration";
     public static final String FIREBASE_PREFIX = "firebase_";
-    public static final String FILTER_PEOPLE = "people";
-    public static final String FILTER_OUT_PII = "filter_out_pii";
+    public static final String GOOGLE_PREFIX = "google_";
+    public static final String GA_PREFIX = "ga_";
+    public static final String SEND_USER_DATA = "send_user_data";
     private static final String TAG = FirebaseAgent.class.getSimpleName();
     private Map<Character,String> legend;
 
     private FirebaseAnalytics mFirebaseAnalytics;
 
     private Map<String,Long> timedEventMap;
-    private boolean filerPii = false;
-    private boolean filterPeople = false;
+    private boolean isSendUserData = false;
 
     @Override
     public void setParams(Map params) {
@@ -49,11 +52,8 @@ public class FirebaseAgent extends BaseAnalyticsAgent {
         if (params == null)
             return;
 
-        if (params.containsKey(FILTER_OUT_PII))
-            filerPii = "1".equals(params.get(FILTER_OUT_PII));
-
-        if (params.containsKey(FILTER_PEOPLE))
-            filterPeople = "1".equals(params.get(FILTER_PEOPLE));
+        if (params.containsKey(SEND_USER_DATA))
+            isSendUserData = "1".equals(params.get(SEND_USER_DATA));
     }
 
     @Override
@@ -207,7 +207,10 @@ public class FirebaseAgent extends BaseAnalyticsAgent {
      */
     public static StringBuilder refactorParamValue(StringBuilder evenValue) {
         
-        if(evenValue.indexOf(FIREBASE_PREFIX) == 0){
+        if(evenValue.indexOf(FIREBASE_PREFIX) == 0
+            || evenValue.indexOf(GOOGLE_PREFIX) == 0
+            || evenValue.indexOf(GA_PREFIX) == 0
+        ) {
             evenValue.insert(0, "_");
         }
 
@@ -252,11 +255,13 @@ public class FirebaseAgent extends BaseAnalyticsAgent {
     @Override
     public void sendUserProperties(JSONObject params) throws JSONException {
         super.sendUserProperties(params);
-        if (params != null && !filterPeople) {
+        if (params != null && isSendUserData) {
 
             // Check if current params include data that should not be sent and remove it
+            // Per Google's policy, it is prohibited to send PII data at all
+            // and we should remove all PII properties from params
             for (String key : AnalyticsStorage.getSpecialPropertiesKeys()) {
-                if (params.has(key) && filerPii) {
+                if (params.has(key)) {
                     params.remove(key);
                 }
             }
