@@ -8,16 +8,24 @@
   "type": "analytics",
   "platform": "android",
   "identifier": "firebase_android",
-  "author_name": "Elad Ben David",
+  "author_name": "Alex Khomich",
   "description": "provide Firebase as analytics agent",
-  "author_email": "e.bendavid@applicaster.com",
-  "min_zapp_sdk": "7.0.0",
+  "author_email": "a.khomich@applicaster.com",
+  "min_zapp_sdk": "8.2.0b9",
   "react_native": false,
   "ui_builder_support": true,
   "dependency_name": "com.applicaster:FirebaseAnalyticsPlugin",
-  "manifest_version": "1.4.0",
-  "dependency_version": "1.4.+",
+  "manifest_version": "2.1.0",
+  "dependency_version": "2.1.0",
   "dependency_repository_url": [],
-  "custom_configuration_fields": [],
+  "custom_configuration_fields": [
+    {
+      "type": "checkbox",
+      "title": "Send User Data",
+      "tooltip": "Sends any user data collected in the app. Per Google's policies, we will not send any user data identified as PII (Personally Identifiable Information).",
+      "key": "send_user_data",
+      "default": 1
+    }
+  ],
   "whitelisted_account_ids": []
 }

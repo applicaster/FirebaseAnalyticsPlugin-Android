@@ -53,7 +53,7 @@ dependencies {
     if (devSDK != null) {
         implementation project(':applicaster-android-sdk')
     } else {
-        implementation 'com.applicaster:applicaster-android-sdk:2.33.6'
+        implementation 'com.applicaster:applicaster-android-sdk:2.34.0'
 
         testImplementation 'junit:junit:4.12'
         testImplementation 'org.mockito:mockito-core:1.10.19'

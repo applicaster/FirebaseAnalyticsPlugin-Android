@@ -273,4 +273,12 @@ public class FirebaseAgent extends BaseAnalyticsAgent {
             }
         }
     }
+
+    @Override
+    public void setScreenView(Activity activity, String screenView) {
+        super.setScreenView(activity, screenView);
+        if (activity != null) {
+            mFirebaseAnalytics.setCurrentScreen(activity, screenView, null);
+        }
+    }
 }
