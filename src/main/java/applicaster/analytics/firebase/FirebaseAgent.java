@@ -37,7 +37,7 @@ public class FirebaseAgent extends BaseAnalyticsAgent {
     public static final String FIREBASE_PREFIX = "firebase_";
     public static final String GOOGLE_PREFIX = "google_";
     public static final String GA_PREFIX = "ga_";
-    public static final String SEND_USER_DATA = "send_user_data";
+    public static final String SEND_USER_DATA = "Send_User_Data";
     private static final String TAG = FirebaseAgent.class.getSimpleName();
     private Map<Character,String> legend;
 
