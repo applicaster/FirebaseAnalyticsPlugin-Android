@@ -1,6 +1,5 @@
 package applicaster.analytics.firebase;
 
-import android.app.Activity;
 import android.content.Context;
 import android.os.Bundle;
 import android.os.SystemClock;
@@ -20,8 +19,6 @@ import java.util.Iterator;
 import java.util.Map;
 import java.util.TreeMap;
 import java.util.concurrent.TimeUnit;
-
-import javax.annotation.Nullable;
 
 
 /**
@@ -271,14 +268,6 @@ public class FirebaseAgent extends BaseAnalyticsAgent {
                 String key = iterator.next();
                 mFirebaseAnalytics.setUserProperty(key, params.getString(key));
             }
-        }
-    }
-
-    @Override
-    public void setScreenView(Activity activity, String screenView) {
-        super.setScreenView(activity, screenView);
-        if (activity != null) {
-            mFirebaseAnalytics.setCurrentScreen(activity, screenView, null);
         }
     }
 }
