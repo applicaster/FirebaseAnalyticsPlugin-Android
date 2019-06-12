@@ -9,7 +9,7 @@
   "platform": "android",
   "identifier": "firebase_android",
   "author_name": "Alex Khomich",
-  "description": "Google's free, deep, and broadly integrated analytics system can help you make more informed business decisions about how to manage your app.",
+  "description": "Google's free, deep, and broadly integrated analytics system designed specifically for mobile.",
   "author_email": "a.khomich@applicaster.com",
   "min_zapp_sdk": "8.2.0b9",
   "react_native": false,
@@ -18,7 +18,7 @@
   "manifest_version": "2.2.0",
   "dependency_version": "2.2.0",
   "dependency_repository_url": [],
-  "cover_image": "https://res.cloudinary.com/dtiodujtz/image/upload/v1553522185/Plugins/GAforFirebase.jpg ",
+  "cover_image": "https://res.cloudinary.com/dtiodujtz/image/upload/v1553522185/Plugins/GAforFirebase.jpg",
   "whitelisted_account_ids": [],
   "custom_configuration_fields": [
     {
