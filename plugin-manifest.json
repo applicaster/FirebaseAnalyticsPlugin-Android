@@ -9,7 +9,7 @@
   "platform": "android",
   "identifier": "firebase_android",
   "author_name": "Alex Khomich",
-  "description": "Google's free, deep, and broadly integrated analytics system designed specifically for mobile.",
+  "description": "Google’s free, robust, and deeply-integrated analytics tool for mobile apps.",
   "author_email": "a.khomich@applicaster.com",
   "min_zapp_sdk": "8.2.0b9",
   "react_native": false,
