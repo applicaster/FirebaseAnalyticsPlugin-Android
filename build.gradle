@@ -1,12 +1,12 @@
 apply plugin: 'com.android.library'
 
 android {
-    compileSdkVersion 27
-    buildToolsVersion "27.0.2"
+    compileSdkVersion 28
+    buildToolsVersion "28.0.3"
 
     defaultConfig {
         minSdkVersion 17
-        targetSdkVersion 27
+        targetSdkVersion 28
 
         consumerProguardFiles 'proguard-rules.pro'
     }
@@ -53,7 +53,7 @@ dependencies {
     if (devSDK != null) {
         implementation project(':applicaster-android-sdk')
     } else {
-        implementation 'com.applicaster:applicaster-android-sdk:2.34.0'
+        implementation 'com.applicaster:applicaster-android-sdk:5.0.+'
 
         testImplementation 'junit:junit:4.12'
         testImplementation 'org.mockito:mockito-core:1.10.19'
@@ -61,7 +61,7 @@ dependencies {
         testImplementation 'org.powermock:powermock-module-junit4:1.6.2'
         testImplementation 'org.robolectric:robolectric:3.1'
     }
-    api 'com.google.firebase:firebase-core:16.0.0'
+    implementation 'com.google.firebase:firebase-analytics:17.2.1'
     implementation fileTree(dir: 'libs', include: ['*.jar'])
 
     testImplementation 'junit:junit:4.11'
@@ -83,9 +83,10 @@ buildscript {
         mavenCentral()
     }
     dependencies {
-        classpath 'com.android.tools.build:gradle:3.0.1'
-        classpath 'com.github.dcendents:android-maven-gradle-plugin:2.0'
-        classpath 'com.jfrog.bintray.gradle:gradle-bintray-plugin:1.8.0'
+        classpath 'com.google.gms:google-services:4.3.3'
+        classpath 'com.android.tools.build:gradle:3.5.3'
+        classpath 'com.github.dcendents:android-maven-gradle-plugin:2.1'
+        classpath 'com.jfrog.bintray.gradle:gradle-bintray-plugin:1.8.4'
     }
 }
 
@@ -106,68 +107,70 @@ def getVersionName = { ->
     }
 }
 
-publishing {
-    publications {
-        mavenJava(MavenPublication) {
-            groupId GROUP
+project.afterEvaluate {
+    publishing {
+        publications {
+            mavenJava(MavenPublication) {
+                groupId GROUP
 
-            def versionFromTag = getVersionName()
-            if (versionFromTag != null) {
-                // There is a tag existing on the current commit - we can upload to Bintray
-                version versionFromTag
+                def versionFromTag = getVersionName()
+                if (versionFromTag != null) {
+                    // There is a tag existing on the current commit - we can upload to Bintray
+                    version versionFromTag
 
-                artifactId ARTIFACT_ID
-                artifact "build/outputs/aar/" + ARTIFACT_FILE_NAME + "-release.aar"
-                artifact androidJavadocsJar
-                artifact androidSourcesJar
-                pom.withXml {
-                    Node root = asNode()
-                    root.appendNode('name', ARTIFACT_ID)
-                    root.appendNode('description', POM_DESCRIPTION)
-                    root.appendNode('url', POM_URL)
+                    artifactId ARTIFACT_ID
+                    artifact "build/outputs/aar/" + ARTIFACT_FILE_NAME + "-release.aar"
+                    artifact androidJavadocsJar
+                    artifact androidSourcesJar
+                    pom.withXml {
+                        Node root = asNode()
+                        root.appendNode('name', ARTIFACT_ID)
+                        root.appendNode('description', POM_DESCRIPTION)
+                        root.appendNode('url', POM_URL)
 
-                    def issues = root.appendNode('issueManagement')
-                    issues.appendNode('system', 'github')
-                    issues.appendNode('url', ISSUE_URL)
+                        def issues = root.appendNode('issueManagement')
+                        issues.appendNode('system', 'github')
+                        issues.appendNode('url', ISSUE_URL)
 
-                    def scm = root.appendNode('scm')
-                    scm.appendNode('url', POM_SCM_URL)
-                    scm.appendNode('connection', POM_SCM_CONNECTION)
-                    scm.appendNode('developerConnection', POM_SCM_DEV_CONNECTION)
+                        def scm = root.appendNode('scm')
+                        scm.appendNode('url', POM_SCM_URL)
+                        scm.appendNode('connection', POM_SCM_CONNECTION)
+                        scm.appendNode('developerConnection', POM_SCM_DEV_CONNECTION)
 
-                    def license = root.appendNode('licenses').appendNode('license')
-                    license.appendNode('name', POM_LICENCE_NAME)
-                    license.appendNode('url', POM_LICENCE_URL)
-                    license.appendNode('distribution', POM_LICENCE_DIST)
+                        def license = root.appendNode('licenses').appendNode('license')
+                        license.appendNode('name', POM_LICENCE_NAME)
+                        license.appendNode('url', POM_LICENCE_URL)
+                        license.appendNode('distribution', POM_LICENCE_DIST)
 
-                    def developer = root.appendNode('developers').appendNode('developer')
-                    developer.appendNode('id', POM_DEVELOPER_ID)
-                    developer.appendNode('name', POM_DEVELOPER_NAME)
-                    developer.appendNode('email', POM_DEVELOPER_EMAIL)
+                        def developer = root.appendNode('developers').appendNode('developer')
+                        developer.appendNode('id', POM_DEVELOPER_ID)
+                        developer.appendNode('name', POM_DEVELOPER_NAME)
+                        developer.appendNode('email', POM_DEVELOPER_EMAIL)
 
-                    def dependenciesNode = asNode().appendNode('dependencies')
-                    configurations.compile.allDependencies.each {
-                        if (!it.name.is('unspecified')) {
-                            def dependencyNode = dependenciesNode.appendNode('dependency')
-                            dependencyNode.appendNode('groupId', it.group)
-                            dependencyNode.appendNode('artifactId', it.name)
-                            dependencyNode.appendNode('version', it.version)
+                        def dependenciesNode = asNode().appendNode('dependencies')
+                        configurations.compile.allDependencies.each {
+                            if (!it.name.is('unspecified')) {
+                                def dependencyNode = dependenciesNode.appendNode('dependency')
+                                dependencyNode.appendNode('groupId', it.group)
+                                dependencyNode.appendNode('artifactId', it.name)
+                                dependencyNode.appendNode('version', it.version)
+                            }
                         }
-                    }
-                    configurations.implementation.allDependencies.each {
-                        if (!it.name.is('unspecified')) {
-                            def dependencyNode = dependenciesNode.appendNode('dependency')
-                            dependencyNode.appendNode('groupId', it.group)
-                            dependencyNode.appendNode('artifactId', it.name)
-                            dependencyNode.appendNode('version', it.version)
+                        configurations.implementation.allDependencies.each {
+                            if (!it.name.is('unspecified')) {
+                                def dependencyNode = dependenciesNode.appendNode('dependency')
+                                dependencyNode.appendNode('groupId', it.group)
+                                dependencyNode.appendNode('artifactId', it.name)
+                                dependencyNode.appendNode('version', it.version)
+                            }
                         }
-                    }
-                    configurations.api.allDependencies.each {
-                        if (!it.name.is('unspecified')) {
-                            def dependencyNode = dependenciesNode.appendNode('dependency')
-                            dependencyNode.appendNode('groupId', it.group)
-                            dependencyNode.appendNode('artifactId', it.name)
-                            dependencyNode.appendNode('version', it.version)
+                        configurations.api.allDependencies.each {
+                            if (!it.name.is('unspecified')) {
+                                def dependencyNode = dependenciesNode.appendNode('dependency')
+                                dependencyNode.appendNode('groupId', it.group)
+                                dependencyNode.appendNode('artifactId', it.name)
+                                dependencyNode.appendNode('version', it.version)
+                            }
                         }
                     }
                 }
